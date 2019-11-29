@@ -3,16 +3,17 @@
 var express = require("express");
 var app = express();
 
-app.get('server/points', function(request, result) {
-	console.log("Placeholder GET server/points");
+app.get('/points', function(request, result) {
+	console.log("Placeholder GET points");
+	result.send("Queried points");
 });
 
-app.get('server/point/last', function(request, result) {
-	console.log("Placeholder GET server/point/last");
+app.get('/points/last', function(request, result) {
+	console.log("Placeholder GET points/last");
 });
 
-app.put('server/point', function(request, result) {
-	console.log("Placeholder PUT server/point");
+app.put('/point', function(request, result) {
+	console.log("Placeholder PUT /point");
 });
 
 var server = app.listen(8081, function() {
