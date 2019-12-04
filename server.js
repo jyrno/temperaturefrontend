@@ -1,6 +1,15 @@
 // Imports
-const express = require("express");
+const fs = require("fs");
+const https = require("https");
 const pgp = require("pg-promise")(/*options*/);
+const express = require("express");
+
+// Setup options for HTTPS
+const basePath = '/etc/letsencrypt/live/sensorio.ml';
+var options = {
+	key: fs.readFileSync(`${basePath}/privkey.pem`),
+	cert: fs.readFileSync(`${basePath}/fullchain.pem`)
+};
 
 // Setup database connection
 const connection = {
@@ -49,6 +58,7 @@ app.post("/point", function(request, result){
 	result.send(request.body);
 });
 
-server = app.listen(8081, function() {
-	console.log("Ready to serve!");
-}); 
+// Run server on secure port 443
+https.createServer(options, app).listen(443, function(){
+	console.log("Let's go!")
+});
