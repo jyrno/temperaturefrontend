@@ -22,7 +22,10 @@ app.get("/", function(request, result){
 
 app.get('/points', function(request, result) {
 	console.log("Placeholder GET points");
-	result.send("Queried points");
+	db.any('SELECT ts date, temperature FROM sensordata ORDER BY 1', [])
+			.then(function(data) {
+					response.json(data);
+			});
 });
 
 app.get('/points/last', function(request, result) {
