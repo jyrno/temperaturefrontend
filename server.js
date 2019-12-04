@@ -29,7 +29,7 @@ app.get("/", function(request, result){
 	result.send("Ready to serve!")
 });
 
-app.get('/points', function(request, result) {
+app.get('/api/points', function(request, result) {
 	console.log("Placeholder GET points");
 	db.any('SELECT ts date, temperature FROM sensordata ORDER BY 1', [])
 			.then(function(data) {
@@ -37,7 +37,7 @@ app.get('/points', function(request, result) {
 			});
 });
 
-app.get('/points/last', function(request, result) {
+app.get('/api/points/last', function(request, result) {
 	console.log("Placeholder GET points/last");
 	db.any('SELECT ts date, temperature FROM sensordata ORDER BY ts DESC LIMIT 1', [])
 			.then(function(data) {
@@ -45,7 +45,7 @@ app.get('/points/last', function(request, result) {
 			});
 });
 
-app.post("/point", function(request, result){
+app.post("/api/point", function(request, result){
 	o = {
 		sensor: request.body.sensor,
 		ts: request.body.timestamp,
