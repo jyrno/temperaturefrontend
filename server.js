@@ -58,6 +58,8 @@ app.post("/point", function(request, result){
 	result.send(request.body);
 });
 
+app.use(express.static(__dirname + '/public'));
+
 // Run server on secure port 443
 https.createServer(options, app).listen(443, function(){
 	console.log("Let's go!")
