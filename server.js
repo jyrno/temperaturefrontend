@@ -3,6 +3,10 @@
 var express = require("express");
 var app = express();
 
+app.get("/", function(request, result){
+	result.send("Ready to serve!")
+});
+
 app.get('/points', function(request, result) {
 	console.log("Placeholder GET points");
 	result.send("Queried points");
