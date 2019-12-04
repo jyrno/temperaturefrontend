@@ -29,8 +29,17 @@ app.get('/points/last', function(request, result) {
 	console.log("Placeholder GET points/last");
 });
 
-app.put('/point', function(request, result) {
-	console.log("Placeholder PUT /point");
+app.post("/point", function(request, result){
+	o = {
+		sensor: request.body.sensor,
+		ts: request.body.timestamp,
+		temp: request.body.data[0].temp,
+		lat: request.body.lat,
+		long: request.body.long
+	};
+
+	db.none('INSERT INTO sensordata(sensor, ts, temperature, lat, long) VALUES (${sensor}, ${ts}, ${temp}, ${lat}, ${long})', o);
+	result.send(request.body);
 });
 
 server = app.listen(8081, function() {
