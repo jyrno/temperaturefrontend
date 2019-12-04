@@ -1,7 +1,20 @@
-// Data API
+// Imports
+const express = require("express");
+const pgp = require("pg-promise")(/*options*/);
 
-var express = require("express");
-var app = express();
+// Setup database connection
+const connection = {
+	host : 'localhost',
+	port: 5432,
+	database: process.env.DBNAME || 'sensorio',
+	user: process.env.DBUSER || 'sensorio',
+	password: process.env.DBPASS || ''
+};
+const db = pgp(connection);
+
+// Define data API endpoints
+app = express();
+app.use(express.json());
 
 app.get("/", function(request, result){
 	result.send("Ready to serve!")
@@ -20,6 +33,6 @@ app.put('/point', function(request, result) {
 	console.log("Placeholder PUT /point");
 });
 
-var server = app.listen(8081, function() {
-	console.log("Töötan!");
+server = app.listen(8081, function() {
+	console.log("Ready to serve!");
 }); 
