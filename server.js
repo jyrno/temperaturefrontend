@@ -30,6 +30,10 @@ app.get('/points', function(request, result) {
 
 app.get('/points/last', function(request, result) {
 	console.log("Placeholder GET points/last");
+	db.any('SELECT ts date, temperature FROM sensordata ORDER BY ts DESC', [])
+			.then(function(data) {
+					response.json(data[0]);
+			});
 });
 
 app.post("/point", function(request, result){
