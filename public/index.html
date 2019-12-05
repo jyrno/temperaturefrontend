@@ -14,17 +14,41 @@
 
 <!-- Chart code -->
 <script>
+var chart;
+
+function loadSensorNames() {
+	fetch('/api/sensors')
+	.then(response => response.json())
+	.then(data => {
+		var sensorDropdown = document.getElementById("sensors");
+		for (sensorName of data) {
+			var option = document.createElement("option");
+			option.text = sensorName;
+			sensorDropdown.add(option);
+		}
+		showChart(data[0]);
+	})
+	.catch(error => console.error(error));
+}
+
+function showChart(sensor) {
+	chart.series.values[0].name = sensor;
+	chart.dataSource.url = "api/sensors/" + sensor + "/points";
+	chart.dataSource.load();
+}
+
+	
     am4core.ready(function() {
 
 // Themes
         am4core.useTheme(am4themes_animated);
 
 // Create chart instance
-        var chart = am4core.create("chartdiv", am4charts.XYChart);
+        chart = am4core.create("chartdiv", am4charts.XYChart);
         chart.dateFormatter.inputDateFormat = "yyyy-MM-ddTHH:mm:ssZ";
 
 // Add data
-        chart.dataSource.url = "api/points";
+        //chart.dataSource.url = "api/sensors/" + sensor + "/points";
         /*chart.data = [
             {date:new Date(), temperature: 13},
             {date:"2019-11-27T13:30:11Z", temperature: 14.23},
@@ -42,7 +66,6 @@
 
 // Create series
         var series = chart.series.push(new am4charts.LineSeries());
-        series.name = "Sensor";
         series.dataFields.valueY = "temperature";
         series.dataFields.dateX = "date";
         series.strokeWidth = 1;
@@ -62,8 +85,11 @@
         chart.cursor.xAxis = dateAxis;
         chart.cursor.snapToSeries = series;
 
+		loadSensorNames();
     }); // end am4core.ready()
 </script>
 
 <!-- HTML -->
+<select id="sensors" onchange="showChart(this.value)">
+</select>
 <div id="chartdiv"></div>

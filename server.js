@@ -5,9 +5,10 @@ var express = require("express");
 var app = express();
 
 app.use(express.static(__dirname + '/public'));
+app.use(express.json());
 
 app.get('/api/create', function(request, result) {
-	db.run('CREATE TABLE measurement(sensor text, date text, value double)');
+	db.run('CREATE TABLE sensordata(sensor text, ts text, temperature double, lat string, long string)');
 	result.send("Andmebaas loodud");
 });
 
@@ -22,17 +23,32 @@ app.get('/api/points/dummy', function(request, result) {
 	]);
 });
 
-app.get('/api/points', function(request, result) {
-	db.all('SELECT date, value temperature FROM measurement ORDER BY date', [], (err, rows) => {
+app.get('/api/sensors', function(request, result) {
+	db.all('***', [], (err, rows) => {
+		const sensors = [];
+		rows.forEach(row => sensors.push(row.sensor));
+		result.send(sensors);
+	});
+});
+
+app.get('/api/sensors/:sensor/points', function(request, result) {
+	const sensor = request.params.sensor;
+	db.all('***', [sensor], (err, rows) => {
 		result.send(rows);
 	});
 });
 
-app.get('/api/add', function(request, result) {
-	const sensor = request.query.sensor;
+app.get('/api/points', function(request, result) {
+	db.all('SELECT * FROM sensordata ORDER BY 1', [], (err, rows) => {
+		result.send(rows);
+	});
+});
+
+app.get('/api/sensors/:sensor/points/add/:value', function(request, result) {
+	const sensor = request.params.sensor;
 	const date = new Date().toJSON();
-	const value = request.query.value;
-	db.run('INSERT INTO measurement(sensor, date, value) VALUES(?, ?, ?)', [sensor, date, value], function(err) {
+	const value = request.params.value;
+	db.run('INSERT INTO sensordata(sensor, ts, temperature) VALUES(?, ?, ?)', [sensor, date, value], function(err) {
 		result.send("Lisatud kirje");
 	});
 });
