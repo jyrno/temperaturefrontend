@@ -1,4 +1,3 @@
-// Imports
 const fs = require("fs");
 const https = require("https");
 const pgp = require("pg-promise")(/*options*/);
@@ -25,28 +24,16 @@ const db = pgp(connection);
 app = express();
 app.use(express.json());
 
-app.get("/", function(request, result){
-	result.send("Ready to serve!")
+app.get("/", function(request, response) {
+	response.send("Ready to serve!")
 });
 
-app.get('/api/points', function(request, result) {
-	console.log("Placeholder GET points");
-	db.any('SELECT ts date, temperature FROM sensordata ORDER BY 1', [])
-			.then(function(data) {
-					response.json(data);
-			});
-});
+app.use(express.static(__dirname + '/public'));
 
-app.get('/api/points/last', function(request, result) {
-	console.log("Placeholder GET points/last");
-	db.any('SELECT ts date, temperature FROM sensordata ORDER BY ts DESC LIMIT 1', [])
-			.then(function(data) {
-					response.json(data);
-			});
-});
-
-app.post("/api/point", function(request, result){
-	o = {
+// Could be /api/sensors/:sensor/points
+app.post("/point", function(request, response) {
+	console.log("POST point for " + request.body.sensor);
+	const o = {
 		sensor: request.body.sensor,
 		ts: request.body.timestamp,
 		temp: request.body.data[0].temp,
@@ -55,12 +42,44 @@ app.post("/api/point", function(request, result){
 	};
 
 	db.none('INSERT INTO sensordata(sensor, ts, temperature, lat, long) VALUES (${sensor}, ${ts}, ${temp}, ${lat}, ${long})', o);
-	result.send(request.body);
+	response.send(request.body);
 });
 
-app.use(express.static(__dirname + '/public'));
+app.get('/api/sensors', function(request, response) {
+	console.log("GET sensors");
+	db.any('SELECT distinct sensor FROM sensordata ORDER BY 1', [])
+		.then(function(data) {
+			const sensors = [];
+			data.forEach(row => sensors.push(row.sensor));
+			response.json(sensors);
+		});
+});
+
+app.get('/api/sensors/:sensor/points', function(request, response) {
+	const sensor = request.params.sensor;
+	console.log("GET points for " + sensor);
+	db.any('SELECT ts date, temperature FROM sensordata WHERE sensor=${sensor} ORDER BY 1', {sensor})
+		.then(function(data) {
+			response.json(data);
+		});
+});
+
+app.get('/api/sensors/:sensor/points/last', function(request, response) {
+	const sensor = request.params.sensor;
+	console.log("GET points/last for " + sensor);
+	db.any('SELECT ts date, temperature FROM sensordata WHERE sensor=${sensor} ORDER BY ts DESC LIMIT 1', {sensor})
+		.then(function(data) {
+			response.json(data);
+		});
+});
 
 // Run server on secure port 443
 https.createServer(options, app).listen(443, function(){
 	console.log("Let's go!")
 });
+
+
+
+
+
+
