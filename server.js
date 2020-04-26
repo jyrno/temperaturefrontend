@@ -58,7 +58,7 @@ app.get('/api/sensors', function(request, response) {
 app.get('/api/sensors/:sensor/points', function(request, response) {
 	const sensor = request.params.sensor;
 	console.log("GET points for " + sensor);
-	db.any('SELECT ts date, temperature FROM sensordata WHERE sensor=${sensor} ORDER BY 1', {sensor})
+	db.any('SELECT ts date, temperature FROM (SELECT ts, temperature FROM sensordata WHERE sensor=${sensor} ORDER BY 1 DESC LIMIT 1000) x ORDER BY 1', {sensor})
 		.then(function(data) {
 			response.json(data);
 		});
